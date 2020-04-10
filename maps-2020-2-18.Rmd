@@ -1,0 +1,40 @@
+---
+title: "Maps 2/20/2020"
+author: "Rebecca Xi"
+date: "2/18-20/2020"
+output: html_document
+---
+
+```{r include=FALSE}
+
+library(tidyverse)
+library(tidycensus)
+
+census_api_key("353a2f580663fe24d1a8e388fa99ca2e28649a3f")
+
+racevars <- c(White = "B02001_002", 
+              Black = "B02001_003", 
+              Asian = "B02001_005",
+              Hispanic = "B03003_003")
+northampton <- get_acs(geography = "tract",
+                  variables = racevars, 
+                  year = 2018,
+                  state = "PA",
+                  county = "Northampton County",
+                  geometry = TRUE,
+                  summary_var = "B02001_001") 
+```
+
+```{r echo=FALSE}
+
+northampton %>%
+  mutate(Percent = 100 * (estimate / summary_est)) %>%
+  ggplot(aes(fill = Percent, color = Percent)) +
+  facet_wrap(~ variable) +
+  geom_sf() +
+  scale_fill_viridis_c(direction = -1) +
+  scale_color_viridis_c(direction = -1) +
+  labs(title = "Racial geography of Northampton County, PA",
+       caption = "Source: American Community Survey 2014-2018") +
+  theme_void()
+```
